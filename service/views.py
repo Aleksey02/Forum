@@ -4,10 +4,13 @@ from django.views.generic import  ListView, DetailView, CreateView, DeleteView, 
 from .form import PostForm, CommentForm, UserRegisterForm
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required #для функции
+from django.contrib.auth.mixins import LoginRequiredMixin #для класса
 
 def index(request):
     return render(request, 'index.html')
 
+@login_required
 def about(request):
     return render(request, 'about.html')
 
@@ -25,23 +28,23 @@ class DetailPostView(DetailView):
     model = Post
     template_name = 'detail_post.html'
 
-class CreatePostView(CreateView):
+class CreatePostView(LoginRequiredMixin, CreateView):
     model = Post
     template_name = 'create_post.html'
     form_class = PostForm
     #fields = "__all__"
 
-class DeletePostView(DeleteView):
+class DeletePostView(LoginRequiredMixin, DeleteView):
     model = Post
     template_name = 'delete_post.html'
     success_url = reverse_lazy('index')
 
-class UpdatePostView(UpdateView):
+class UpdatePostView(LoginRequiredMixin, UpdateView):
     model = Post
     template_name = 'create_post.html'
     form_class = PostForm
 
-class AddCommentView(CreateView):
+class AddCommentView(LoginRequiredMixin, CreateView):
     model = Coment
     template_name = 'add_comment.html'
     form_class = CommentForm
