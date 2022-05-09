@@ -4,20 +4,28 @@ from django.views.generic import  ListView, DetailView, CreateView, DeleteView, 
 from .form import PostForm, CommentForm, UserRegisterForm
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.decorators import login_required #для функции
-from django.contrib.auth.mixins import LoginRequiredMixin #для класса
+from django.contrib.auth.decorators import login_required, permission_required #для функции
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin  #для класса
 
 def index(request):
     return render(request, 'index.html')
 
-@login_required
+# @user_passes_test('test_func')
 def about(request):
     return render(request, 'about.html')
+
+# def test_func(user):
+#     return user.email.endswith('@example.com')
+
+# class MyView(UserPassesTestMixin, View):
+#     def test_func(self):
+#         return self.request.user.email.endswith('@example.com')
 
 class RegisterForm(CreateView):
     form_class = UserRegisterForm
     template_name = 'register.html'
     success_url = reverse_lazy('login')
+
 
 class PostsView(ListView):
     model = Post
@@ -28,18 +36,25 @@ class DetailPostView(DetailView):
     model = Post
     template_name = 'detail_post.html'
 
-class CreatePostView(LoginRequiredMixin, CreateView):
+# class UsePerm(PermissionRequiredMixin):
+#     def dispatch(self, request, *args, **kwargs):
+#         return super().dispatch(request, *args, **kwargs) можно погуглить
+
+class CreatePostView(PermissionRequiredMixin, CreateView):
+    permission_required = 'service.add_post'
     model = Post
     template_name = 'create_post.html'
     form_class = PostForm
     #fields = "__all__"
 
-class DeletePostView(LoginRequiredMixin, DeleteView):
+class DeletePostView(PermissionRequiredMixin, DeleteView):
+    permission_required = 'service.delete_post'
     model = Post
     template_name = 'delete_post.html'
     success_url = reverse_lazy('index')
 
-class UpdatePostView(LoginRequiredMixin, UpdateView):
+class UpdatePostView(PermissionRequiredMixin, UpdateView):
+    permission_required = 'service.change_post'
     model = Post
     template_name = 'create_post.html'
     form_class = PostForm

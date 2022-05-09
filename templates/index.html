@@ -11,7 +11,9 @@
 
         {% block content %}
             <h1>Forum</h1>
+            {% if user.is_superuser or user.is_staff %}
             <a href="{% url 'create_post' %}" class="btn btn-primary">Create New Post</a>
+            {% endif %}
         <table class="table">
   <thead>
     <tr>
